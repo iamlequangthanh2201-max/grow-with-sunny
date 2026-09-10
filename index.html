@@ -165,7 +165,7 @@
 }
 
 
-/* Hệ "Ấm" — một chế độ sáng duy nhất, cố ý. */
+/* Hệ "Ấm" - một chế độ sáng duy nhất, cố ý. */
 :root{
   --ground:#FFF3EA; --surface:#FFFFFF; --surface-2:#FBEADC;
   --ink:#4A251C; --ink-2:#6E4638; --ink-3:#7E6051; --ink-mute:#A38878;
@@ -309,10 +309,7 @@ footer{margin-top:70px;padding-top:26px;border-top:1px solid var(--line);font-si
   tbody td::before{content:attr(data-label);display:block;font-size:10px;font-weight:700;letter-spacing:.11em;
     text-transform:uppercase;color:var(--ink-3);margin-bottom:2px;font-family:var(--body)}
   td:first-child{width:auto;background:var(--surface-2);font-size:17px}
-  .grp{padding:14px 12px 4px}
   .vocab{grid-template-columns:1fr 1fr}
-  .wrap{padding:0 16px 90px}
-  .card{padding:20px 18px}
 }
 @media print{
   body{background:#fff}
@@ -487,6 +484,21 @@ li.r--flat{cursor:default}
 .src p{font-size:12.3px;line-height:1.55;color:var(--ink-3);margin:6px 0 0;max-width:62ch}
 
 /* --- kịch bản: danh sách thu gọn --- */
+.sfind{margin:16px 0 0}
+.sfind input{display:block;width:100%;font-family:var(--body);font-size:13.5px;color:var(--ink);
+  background:var(--surface);border:var(--hair);border-radius:var(--r-pill);padding:12px 18px;
+  -webkit-appearance:none;appearance:none}
+.sfind input::placeholder{color:var(--ink-3)}
+.sfind input:focus{outline:2px solid var(--ember-ink);outline-offset:1px;border-color:transparent}
+/* bộ đếm và thông báo rỗng gộp một dòng dưới, để ô nhập luôn chiếm trọn chiều ngang */
+.sfind-msg{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-size:12.5px;color:var(--ink-3);margin:9px 2px 0}
+.sfind-msg b{font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.sfind-msg.none{background:var(--surface-2);border-radius:var(--r-card);padding:14px 16px;margin:12px 0 0}
+.sfind-x{font-family:var(--body);font-size:12px;font-weight:600;color:var(--ember-ink);
+  background:transparent;border:0;border-bottom:1px dotted var(--line);padding:2px 0;cursor:pointer}
+.sfind-x:hover{color:var(--ink)}
+.scen[hidden]{display:none}
 .scen-list{background:var(--surface);border:var(--hair);border-radius:var(--r-card);overflow:hidden;margin:16px 0}
 .scen{border-bottom:1px solid var(--line-2);margin:0}
 .scen:last-child{border-bottom:0}
@@ -563,11 +575,14 @@ footer{font-size:11.8px;margin-top:28px;padding-top:16px;border-top:var(--hair);
 
 /* vùng chạm >= 44px khi dùng bằng ngón tay */
 @media(max-width:1039px){
+  /* vùng chạm >= 44px, NHƯNG vẫn giữ đệm ngang của thẻ:
+     padding-left:0 là di chứng từ hồi hàng còn phẳng, chưa nằm trong thẻ */
   .ch-btn{padding:13px 11px;font-size:13.5px}
   .sub-list a{padding:14px 10px 14px 11px;font-size:12.8px}
-  .scen>summary{padding:14px 22px 14px 0}
-  .r>summary{padding:12px 24px 12px 0}
-  .src>summary{padding:6px 0}
+  .sfind-x{padding:15px 0}
+  .scen>summary{padding:14px 38px 14px 16px}
+  .r>summary,li.r--flat{padding:13px 38px 13px 16px}
+  .src>summary{padding:7px 0}
 }
 @media(max-width:620px){
   .doc{padding:16px 14px calc(56px + 40vh)}
@@ -960,7 +975,11 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
  <div class="tip"><b>Đọc trước, không đọc giữa cơn</b>
  Kịch bản chỉ có tác dụng nếu đã đọc lúc bình tĩnh. Giữa cơn thì không ai tra sổ tay - thứ chạy lúc đó là phản xạ, mà phản xạ thì phải luyện trước.</div>
 
-<div class="scen-list"><details class="scen"><summary><span class="scode">A1</span><span class="stitle">Con khóc đêm không dứt, hai giờ sáng, bố đã kiệt</span><span class="sage">0-18 tháng</span></summary><div class="sbody">
+<div class="sfind">
+  <input type="search" id="scen-q" placeholder="Tìm tình huống: khóc đêm, an va, danh ban..." autocomplete="off" spellcheck="false" aria-label="Tìm tình huống" aria-controls="scen-list">
+</div>
+<p class="sfind-msg" id="scen-msg" hidden aria-live="polite"></p>
+<div class="scen-list" id="scen-list"><details class="scen"><summary><span class="scode">A1</span><span class="stitle">Con khóc đêm không dứt, hai giờ sáng, bố đã kiệt</span><span class="sage">0-18 tháng</span></summary><div class="sbody">
 
 <div class="grp grp--y">
 <div class="grp-h">Nên theo</div>
@@ -1323,9 +1342,9 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
     var rep=fl.filter(function(f){return f.repaired&&f.repaired!=='Chưa';});
     var st=document.getElementById('wstats');
     st.innerHTML=''
-      +'<div class="stat"><b>'+got.length+'/7</b><span>tối có ghi — tuần ghi thưa thường là tuần nặng nhất</span></div>'
+      +'<div class="stat"><b>'+got.length+'/7</b><span>tối có ghi - tuần ghi thưa thường là tuần nặng nhất</span></div>'
       +'<div class="stat"><b>'+fl.length+'</b><span>cơn nóng đã ghi trong tuần</span></div>'
-      +'<div class="stat"><b>'+rep.length+'/'+(fl.length||0)+'</b><span>lần đã sửa chữa — chỉ số quan trọng hơn số cơn nóng</span></div>';
+      +'<div class="stat"><b>'+rep.length+'/'+(fl.length||0)+'</b><span>lần đã sửa chữa - chỉ số quan trọng hơn số cơn nóng</span></div>';
     var sp=document.getElementById('wspark');
     sp.innerHTML=ds.map(function(k){
       var v=S.days[k]?(S.days[k].tension||0):0;
@@ -1341,7 +1360,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
     lg.innerHTML=S.flares.slice(0,8).map(function(f,i){
       var t=f.repaired&&f.repaired!=='Chưa'?'<span class="tagline t-ok">đã sửa</span>':'<span class="tagline t-no">chưa sửa</span>';
       return '<div class="log-i"><button data-del="'+i+'" title="Xoá">✕</button><span class="m">'+f.d+' · mức '+f.temp+'</span><br>'
-        +t+'<span class="d">'+(f.what||'(không ghi sự việc)')+(f.under.length?' — dưới cơn giận: '+f.under.join(', '):'')+'</span></div>';
+        +t+'<span class="d">'+(f.what||'(không ghi sự việc)')+(f.under.length?' - dưới cơn giận: '+f.under.join(', '):'')+'</span></div>';
     }).join('')||'<p class="csub" style="margin:10px 0">Chưa có lần ghi nào. Mục này chỉ mở khi có chuyện.</p>';
     var w=week();
     Array.prototype.forEach.call(document.querySelectorAll('[data-w]'),function(el){
@@ -1359,7 +1378,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
     var el=document.getElementById('jstat')||document.getElementById('lstat');
     if(el)el.textContent=msg;
   }
-  /* Trình xem artifact không cho trang tự tải file — phải đi qua capability `downloads`,
+  /* Trình xem artifact không cho trang tự tải file - phải đi qua capability `downloads`,
      người xem sẽ thấy hộp xác nhận. Giữ đường cũ làm dự phòng khi mở file ngoài trình xem. */
   function legacyDownload(name,text,mime){
     try{
@@ -1380,7 +1399,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
         },function(err){
           var c=err&&err.code;
           if(c==='declined') dlNote('Bạn đã huỷ lưu file.');
-          else if(c==='rate_limited') dlNote('Đang có một hộp lưu khác mở — thử lại sau vài giây.');
+          else if(c==='rate_limited') dlNote('Đang có một hộp lưu khác mở - thử lại sau vài giây.');
           else if(c==='too_large') dlNote('Nhật ký quá lớn để lưu thành file.');
           else if(!legacyDownload(name,text,mime)) dlNote('Không lưu được file ở đây. Hãy dùng nút sao chép.');
         });
@@ -1393,7 +1412,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
     Object.keys(S.days).sort().reverse().forEach(function(k){
       var d=S.days[k];
       L.push('### '+k);
-      L.push('- Cảm xúc: '+(d.mood||'—')+' · mức căng '+(d.tension||0)+'/10');
+      L.push('- Cảm xúc: '+(d.mood||'-')+' · mức căng '+(d.tension||0)+'/10');
       if((d.body||[]).length) L.push('- Cơ thể: '+d.body.join(', '));
       if(d.presence) L.push('- Ở cạnh con: '+d.presence);
       if(d.win) L.push('- Làm được: '+d.win);
@@ -1401,7 +1420,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
     });
     L.push('## Sổ cơn nóng','');
     S.flares.forEach(function(f){
-      L.push('### '+f.d+' — mức '+f.temp+'/10');
+      L.push('### '+f.d+' - mức '+f.temp+'/10');
       if(f.what) L.push('- Chuyện gì: '+f.what);
       if(f.under.length) L.push('- Dưới cơn giận: '+f.under.join(', '));
       if(f.echo) L.push('- Vọng từ tuổi thơ: '+f.echo);
@@ -1456,6 +1475,48 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
 
 </script>
 <script>
+/* ---------- lọc kịch bản ---------- */
+(function(){
+  var q=document.getElementById('scen-q'); if(!q)return;
+  var list=document.getElementById('scen-list'), msg=document.getElementById('scen-msg');
+  var items=[].slice.call(list.querySelectorAll('.scen')).map(function(el){
+    var t=function(sel){var x=el.querySelector(sel);return x?x.textContent:'';};
+    return {el:el, key:norm(t('.scode')+' '+t('.stitle')+' '+t('.sage'))};
+  });
+  /* bỏ dấu để gõ không dấu vẫn tìm được: "an va" ra "ăn vạ" */
+  function norm(s){
+    return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d')
+            .replace(/\s+/g,' ').trim();
+  }
+  function run(){
+    var k=norm(q.value);
+    var hit=0;
+    items.forEach(function(it){
+      var ok=!k||it.key.indexOf(k)>=0;
+      it.el.hidden=!ok;
+      if(ok)hit++; else it.el.open=false;
+    });
+    if(!k){ msg.hidden=true; msg.className='sfind-msg'; msg.textContent=''; }
+    else if(hit===0){
+      msg.hidden=false; msg.className='sfind-msg none';
+      msg.innerHTML='Không có tình huống nào khớp. Thử từ khoá khác. '
+        +'<button type="button" class="sfind-x" data-clear>Xoá tìm</button>';
+    }else{
+      msg.hidden=false; msg.className='sfind-msg';
+      msg.innerHTML='Hiện <b>'+hit+'/'+items.length+'</b> tình huống '
+        +'<button type="button" class="sfind-x" data-clear>Xoá tìm</button>';
+    }
+    list.hidden=(k&&hit===0);
+  }
+  msg.addEventListener('click',function(e){
+    if(e.target.closest('[data-clear]')){ q.value=''; run(); q.focus(); }
+  });
+  q.addEventListener('input',run);
+  q.addEventListener('search',run);
+  q.addEventListener('keydown',function(e){ if(e.key==='Escape'){q.value='';run();} });
+  run();
+})();
+
 /* ---------- menu chương → đề mục ---------- */
 (function(){
   var SECS=[].slice.call(document.querySelectorAll('main section'));
@@ -1537,7 +1598,7 @@ Việc cần làm đổi theo tuổi, nhưng ba thứ thì không: <strong>đáp
       buildPager(m.idx); watch(m.sec); cur=id;
     }
     if(push!==false){try{history.replaceState(null,'',anchor?('#'+anchor):('#'+id));}catch(e){}}
-    /* đọc rect đã buộc tính lại layout — không cần rAF (rAF không chạy khi trang ẩn) */
+    /* đọc rect đã buộc tính lại layout - không cần rAF (rAF không chạy khi trang ẩn) */
     var t=anchor?document.getElementById(anchor):null;
     if(t){
       if(t.tagName==='DETAILS') t.open=true;      /* mở sẵn kịch bản được nhắm tới */
